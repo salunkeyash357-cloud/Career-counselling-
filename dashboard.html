@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Student Dashboard – CareerGuide AI</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"/>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap"/>
+  <link rel="stylesheet" href="/static/css/style.css"/>
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg sticky-top">
+  <div class="container">
+    <a class="navbar-brand" href="/">🤖 CareerGuide AI</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navMenu">
+      <ul class="navbar-nav ms-auto align-items-lg-center gap-1">
+        <li class="nav-item"><a class="nav-link" href="/">Home</a></li>
+        <li class="nav-item"><a class="nav-link" href="/assessment">Assessment</a></li>
+        <li class="nav-item"><a class="nav-link" href="/chatbot">AI Chat</a></li>
+        <li class="nav-item"><a class="nav-link" href="/roadmap">Roadmap</a></li>
+        <li class="nav-item"><a class="nav-link active" href="/dashboard">Dashboard</a></li>
+        <li class="nav-item ms-2">
+          <button class="theme-toggle" id="themeToggle"><span id="themeIcon">🌙</span></button>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<main class="container" style="padding:2.5rem 0 4rem">
+
+  <div class="row g-4">
+
+    <!-- ── Left Column: Profile Setup ──────────────────────────────────── -->
+    <div class="col-lg-5">
+
+      <!-- Profile Card -->
+      <div class="card-custom mb-4 reveal">
+        <div style="text-align:center;margin-bottom:1.5rem">
+          <div class="profile-avatar mx-auto">
+            <span id="profileInitial">👤</span>
+          </div>
+          <h4 id="displayName" style="margin-bottom:.25rem">Your Profile</h4>
+          <div id="displayEducation" style="font-size:.85rem;color:var(--text-muted)">Complete your profile below</div>
+          <div style="display:flex;justify-content:center;gap:.5rem;margin-top:.75rem;flex-wrap:wrap" id="displaySkillsTags"></div>
+        </div>
+
+        <!-- Profile Form -->
+        <form id="profileForm">
+          <div class="row g-3">
+            <div class="col-6">
+              <div class="form-group">
+                <label class="form-label-custom">Full Name *</label>
+                <input type="text" id="profileName" class="form-control-custom" placeholder="Your name"/>
+              </div>
+            </div>
+            <div class="col-6">
+              <div class="form-group">
+                <label class="form-label-custom">Email</label>
+                <input type="email" id="profileEmail" class="form-control-custom" placeholder="you@email.com"/>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label-custom">Education Level</label>
+            <select id="profileEducation" class="form-select-custom">
+              <option value="">Select...</option>
+              <option>High School / 12th Grade</option>
+              <option>Bachelor's Degree (B.Tech / B.Sc / BCA)</option>
+              <option>Master's Degree (M.Tech / M.Sc / MCA)</option>
+              <option>MBA</option>
+              <option>PhD</option>
+              <option>Diploma / Polytechnic</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label-custom">GPA / CGPA / Percentage</label>
+            <input type="text" id="profileGpa" class="form-control-custom" placeholder="e.g. 8.5 CGPA or 85%"/>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label-custom">Skills <span style="font-size:.75rem;color:var(--text-muted)">(press Enter or comma to add)</span></label>
+            <div class="skills-container" id="skillsContainer">
+              <input type="text" id="skillsInput" class="skills-input" placeholder="Type a skill and press Enter..."/>
+            </div>
+          </div>
+
+          <!-- Quick-add skill pills -->
+          <div style="display:flex;flex-wrap:wrap;gap:.35rem;margin-bottom:.75rem">
+            <span style="font-size:.75rem;color:var(--text-muted);width:100%;margin-bottom:.2rem">Quick add:</span>
+            {% for skill in ['Python','JavaScript','SQL','Machine Learning','React','Java','C++','Excel','Power BI','TensorFlow','Docker','AWS'] %}
+            <span class="chip" style="font-size:.75rem;padding:.2rem .6rem;cursor:pointer" onclick="ProfileManager.addSkill('{{ skill }}')">+{{ skill }}</span>
+            {% endfor %}
+          </div>
+
+          <div class="form-group">
+            <label class="form-label-custom">Interests</label>
+            <div class="interest-grid" style="grid-template-columns:repeat(auto-fill,minmax(90px,1fr));gap:.5rem">
+              {% for interest in ['AI/ML','Web Dev','Data Science','Cloud','Cybersecurity','Mobile','Design','Business','Finance','Research'] %}
+              <div class="interest-item" data-interest="{{ interest }}" style="font-size:.78rem;padding:.5rem">{{ interest }}</div>
+              {% endfor %}
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label-custom">Career Goals</label>
+            <textarea id="profileGoals" class="form-control-custom" rows="2" placeholder="e.g. Become an ML Engineer at a FAANG company within 2 years"></textarea>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label-custom">Work Experience</label>
+            <select id="profileExperience" class="form-select-custom">
+              <option value="none">No experience</option>
+              <option value="internship">Internship(s)</option>
+              <option value="fresher">Fresher (&lt;1 year)</option>
+              <option value="1-3 years">1–3 years</option>
+              <option value="3-5 years">3–5 years</option>
+              <option value="5+ years">5+ years</option>
+            </select>
+          </div>
+
+          <div class="row g-3">
+            <div class="col-6">
+              <div class="form-group">
+                <label class="form-label-custom">Timeline</label>
+                <select id="profileTimeline" class="form-select-custom">
+                  <option>6 months</option>
+                  <option>1 year</option>
+                  <option>2 years</option>
+                  <option>3+ years</option>
+                </select>
+              </div>
+            </div>
+            <div class="col-6">
+              <div class="form-group">
+                <label class="form-label-custom">Hours / Week</label>
+                <select id="profileHours" class="form-select-custom">
+                  <option value="5">1–5 hrs</option>
+                  <option value="10" selected>5–10 hrs</option>
+                  <option value="20">10–20 hrs</option>
+                  <option value="40">40+ hrs</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label-custom">Personality Style</label>
+            <select id="profilePersonality" class="form-select-custom">
+              <option value="">Select...</option>
+              <option value="analytical">Analytical – data, logic, systems</option>
+              <option value="creative">Creative – design, storytelling</option>
+              <option value="social">Social – people, communication</option>
+              <option value="entrepreneurial">Entrepreneurial – building, leading</option>
+              <option value="investigative">Investigative – research, puzzles</option>
+            </select>
+          </div>
+
+          <button type="submit" class="btn-primary-custom w-100" style="margin-top:.5rem">
+            💾 Save Profile &amp; Update Dashboard
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <!-- ── Right Column: Dashboard ──────────────────────────────────────── -->
+    <div class="col-lg-7">
+
+      <!-- Metrics Row -->
+      <div class="row g-3 mb-4 reveal">
+        <div class="col-6 col-sm-3">
+          <div class="metric-card">
+            <div style="font-size:1.4rem;margin-bottom:.35rem">🎯</div>
+            <div class="metric-value" id="metricCareerMatch">—</div>
+            <div class="metric-label">Career Match</div>
+          </div>
+        </div>
+        <div class="col-6 col-sm-3">
+          <div class="metric-card">
+            <div style="font-size:1.4rem;margin-bottom:.35rem">🛠️</div>
+            <div class="metric-value" id="metricSkills">0</div>
+            <div class="metric-label">Skills</div>
+          </div>
+        </div>
+        <div class="col-6 col-sm-3">
+          <div class="metric-card">
+            <div style="font-size:1.4rem;margin-bottom:.35rem">📊</div>
+            <div class="metric-value" id="metricGpa">—</div>
+            <div class="metric-label">GPA</div>
+          </div>
+        </div>
+        <div class="col-6 col-sm-3">
+          <div class="metric-card">
+            <div style="font-size:1.4rem;margin-bottom:.35rem">⚡</div>
+            <div class="metric-value" id="metricReadiness">—</div>
+            <div class="metric-label">Readiness</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick Actions -->
+      <div class="card-custom mb-4 reveal" style="transition-delay:.1s">
+        <div style="font-weight:700;margin-bottom:1rem">⚡ AI-Powered Actions</div>
+        <div class="row g-2">
+          <div class="col-6 col-sm-3">
+            <a href="/assessment" style="display:flex;flex-direction:column;align-items:center;gap:.4rem;padding:1rem .75rem;background:var(--bg-surface);border:1px solid var(--border);border-radius:10px;text-align:center;font-size:.8rem;font-weight:600;color:var(--text);transition:all .2s;text-decoration:none" onmouseover="this.style.borderColor='var(--primary)'" onmouseout="this.style.borderColor='var(--border)'">
+              <span style="font-size:1.5rem">🎯</span> Assessment
+            </a>
+          </div>
+          <div class="col-6 col-sm-3">
+            <a href="/chatbot" style="display:flex;flex-direction:column;align-items:center;gap:.4rem;padding:1rem .75rem;background:var(--bg-surface);border:1px solid var(--border);border-radius:10px;text-align:center;font-size:.8rem;font-weight:600;color:var(--text);transition:all .2s;text-decoration:none" onmouseover="this.style.borderColor='var(--primary)'" onmouseout="this.style.borderColor='var(--border)'">
+              <span style="font-size:1.5rem">💬</span> AI Chat
+            </a>
+          </div>
+          <div class="col-6 col-sm-3">
+            <a href="/roadmap" style="display:flex;flex-direction:column;align-items:center;gap:.4rem;padding:1rem .75rem;background:var(--bg-surface);border:1px solid var(--border);border-radius:10px;text-align:center;font-size:.8rem;font-weight:600;color:var(--text);transition:all .2s;text-decoration:none" onmouseover="this.style.borderColor='var(--primary)'" onmouseout="this.style.borderColor='var(--border)'">
+              <span style="font-size:1.5rem">🗺️</span> Roadmap
+            </a>
+          </div>
+          <div class="col-6 col-sm-3">
+            <a href="/roadmap#skills" style="display:flex;flex-direction:column;align-items:center;gap:.4rem;padding:1rem .75rem;background:var(--bg-surface);border:1px solid var(--border);border-radius:10px;text-align:center;font-size:.8rem;font-weight:600;color:var(--text);transition:all .2s;text-decoration:none" onmouseover="this.style.borderColor='var(--primary)'" onmouseout="this.style.borderColor='var(--border)'">
+              <span style="font-size:1.5rem">📊</span> Skill Gap
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Skills Radar-Style -->
+      <div class="card-custom mb-4 reveal" style="transition-delay:.15s">
+        <div style="font-weight:700;margin-bottom:1rem">🛠️ Skills Overview</div>
+        <div id="skillsOverview">
+          <div style="text-align:center;padding:2rem;color:var(--text-muted);font-size:.875rem">
+            Add skills in the profile form to see your skills overview.
+          </div>
+        </div>
+      </div>
+
+      <!-- Recommendations Panel -->
+      <div class="card-custom mb-4 reveal" style="transition-delay:.2s">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem">
+          <div style="font-weight:700">🤖 AI Recommendations</div>
+          <button id="refreshRec" onclick="loadRecommendations()" class="chip" style="font-size:.75rem;padding:.3rem .7rem">Refresh</button>
+        </div>
+        <div id="recommendationsPanel">
+          <div style="text-align:center;padding:2rem;color:var(--text-muted);font-size:.875rem">
+            <div style="font-size:2rem;margin-bottom:.75rem">🤖</div>
+            Save your profile to get AI career recommendations powered by IBM Granite.
+            <div style="margin-top:1rem">
+              <a href="/assessment" class="btn-primary-custom" style="font-size:.8rem;padding:.45rem 1rem">Take Assessment →</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Activity Timeline -->
+      <div class="card-custom reveal" style="transition-delay:.25s">
+        <div style="font-weight:700;margin-bottom:1rem">📅 Recent Activity</div>
+        <div id="activityTimeline">
+          <div class="activity-item">
+            <div class="activity-dot" style="background:var(--primary)"></div>
+            <div>
+              <div style="font-size:.875rem;font-weight:600">Welcome to CareerGuide AI 🎉</div>
+              <div style="font-size:.78rem;color:var(--text-muted)">Complete your profile to get started</div>
+            </div>
+          </div>
+          <div class="activity-item">
+            <div class="activity-dot" style="background:var(--border)"></div>
+            <div style="font-size:.875rem;color:var(--text-muted)">🎯 Career Assessment – not started</div>
+          </div>
+          <div class="activity-item">
+            <div class="activity-dot" style="background:var(--border)"></div>
+            <div style="font-size:.875rem;color:var(--text-muted)">🗺️ Career Roadmap – not generated</div>
+          </div>
+          <div class="activity-item">
+            <div class="activity-dot" style="background:var(--border)"></div>
+            <div style="font-size:.875rem;color:var(--text-muted)">📝 Resume Review – not analysed</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</main>
+
+<footer>
+  <div class="container">
+    <p>🤖 <strong>CareerGuide AI</strong> · Powered by IBM watsonx.ai · Granite · IBM Cloud Lite</p>
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/marked@12.0.0/marked.min.js"></script>
+<script src="/static/js/app.js"></script>
+<script>
+// Dashboard-specific logic
+document.addEventListener('DOMContentLoaded', async () => {
+  // Load saved profile into metrics
+  try {
+    const profile = await API.get('/api/profile');
+    if (profile && profile.name) {
+      updateMetrics(profile);
+      updateSkillsOverview(profile.skills || []);
+      document.getElementById('displayName').textContent = profile.name;
+      document.getElementById('displayEducation').textContent = profile.education || '';
+      const initial = document.getElementById('profileInitial');
+      if (initial) initial.textContent = profile.name.charAt(0).toUpperCase();
+    }
+  } catch(_) {}
+});
+
+// Update profile on change in real time
+document.getElementById('profileName')?.addEventListener('input', (e) => {
+  document.getElementById('displayName').textContent = e.target.value || 'Your Profile';
+  const i = document.getElementById('profileInitial');
+  if (i) i.textContent = e.target.value ? e.target.value.charAt(0).toUpperCase() : '👤';
+});
+document.getElementById('profileEducation')?.addEventListener('change', (e) => {
+  document.getElementById('displayEducation').textContent = e.target.value;
+});
+
+function updateMetrics(profile) {
+  const skills = profile.skills || [];
+  document.getElementById('metricSkills').textContent = skills.length;
+  document.getElementById('metricGpa').textContent = profile.gpa || '—';
+  // Readiness score: simple heuristic
+  let score = 0;
+  if (profile.name) score += 10;
+  if (profile.education) score += 15;
+  if (skills.length >= 3) score += 25;
+  if (skills.length >= 6) score += 15;
+  if (profile.goals) score += 20;
+  if (profile.experience && profile.experience !== 'none') score += 15;
+  document.getElementById('metricReadiness').textContent = score + '%';
+  document.getElementById('metricCareerMatch').textContent = skills.length > 0 ? '✓' : '—';
+}
+
+function updateSkillsOverview(skills) {
+  const container = document.getElementById('skillsOverview');
+  if (!container || skills.length === 0) return;
+  const levels = ['Beginner','Intermediate','Intermediate','Advanced','Expert'];
+  const colors = ['#da1e28','#f1c21b','#0f62fe','#24a148','#8a3ffc'];
+  container.innerHTML = skills.map((s, i) => {
+    const level = Math.min(i + 2, 4);
+    const pct = [25,45,60,80,95][level - 1];
+    return `
+    <div style="margin-bottom:.75rem">
+      <div style="display:flex;justify-content:space-between;font-size:.825rem;margin-bottom:.3rem">
+        <span>${s}</span>
+        <span style="color:${colors[level-1]};font-size:.75rem">${levels[level-1]}</span>
+      </div>
+      <div class="progress-bar-custom">
+        <div class="progress-fill" style="width:${pct}%;background:${colors[level-1]}"></div>
+      </div>
+    </div>`;
+  }).join('');
+  // Also update tags in profile card
+  const tagsEl = document.getElementById('displaySkillsTags');
+  if (tagsEl) {
+    tagsEl.innerHTML = skills.slice(0,5).map(s =>
+      `<span class="skill-tag">${s}</span>`
+    ).join('') + (skills.length > 5 ? `<span style="font-size:.75rem;color:var(--text-muted)">+${skills.length-5} more</span>` : '');
+  }
+}
+
+async function loadRecommendations() {
+  const panel = document.getElementById('recommendationsPanel');
+  if (!panel) return;
+  panel.innerHTML = `<div class="text-center py-3"><div class="spinner mx-auto" style="width:32px;height:32px;border-width:3px"></div><p style="font-size:.8rem;color:var(--text-muted);margin-top:.75rem">Analysing with IBM Granite...</p></div>`;
+  try {
+    const data = await API.post('/api/assess', {});
+    panel.innerHTML = `<div class="ai-content" style="font-size:.85rem">${MD.render(data.assessment)}</div>`;
+  } catch(err) {
+    panel.innerHTML = `<p style="color:var(--danger);font-size:.85rem">❌ ${err.message} – <a href="/assessment">Try Assessment instead</a></p>`;
+  }
+}
+</script>
+</body>
+</html>

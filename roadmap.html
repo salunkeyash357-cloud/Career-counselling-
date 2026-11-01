@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Roadmap & Tools – CareerGuide AI</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"/>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap"/>
+  <link rel="stylesheet" href="/static/css/style.css"/>
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg sticky-top">
+  <div class="container">
+    <a class="navbar-brand" href="/">🤖 CareerGuide AI</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navMenu">
+      <ul class="navbar-nav ms-auto align-items-lg-center gap-1">
+        <li class="nav-item"><a class="nav-link" href="/">Home</a></li>
+        <li class="nav-item"><a class="nav-link" href="/assessment">Assessment</a></li>
+        <li class="nav-item"><a class="nav-link" href="/chatbot">AI Chat</a></li>
+        <li class="nav-item"><a class="nav-link active" href="/roadmap">Roadmap</a></li>
+        <li class="nav-item"><a class="nav-link" href="/dashboard">Dashboard</a></li>
+        <li class="nav-item ms-2">
+          <button class="theme-toggle" id="themeToggle"><span id="themeIcon">🌙</span></button>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<main class="container" style="padding:2.5rem 0 4rem">
+  <div class="text-center mb-5 reveal">
+    <div class="section-label">AI Toolkit</div>
+    <h1 style="font-size:2rem">Career Tools & Roadmap Generator</h1>
+    <p style="color:var(--text-muted);max-width:540px;margin:0 auto">IBM Granite-powered tools for skill analysis, career roadmaps, course discovery, and resume review.</p>
+  </div>
+
+  <!-- Tabs -->
+  <ul class="nav nav-pills justify-content-center mb-4 reveal" id="toolTabs" role="tablist" style="gap:.5rem;flex-wrap:wrap">
+    <li class="nav-item">
+      <button class="nav-link active" data-bs-toggle="pill" data-bs-target="#roadmapTab" style="border-radius:10px;font-size:.875rem">🗺️ Roadmap</button>
+    </li>
+    <li class="nav-item">
+      <button class="nav-link" data-bs-toggle="pill" data-bs-target="#skillGapTab" style="border-radius:10px;font-size:.875rem">📊 Skill Gap</button>
+    </li>
+    <li class="nav-item">
+      <button class="nav-link" data-bs-toggle="pill" data-bs-target="#coursesTab" style="border-radius:10px;font-size:.875rem">📚 Courses</button>
+    </li>
+    <li class="nav-item">
+      <button class="nav-link" data-bs-toggle="pill" data-bs-target="#resumeTab" style="border-radius:10px;font-size:.875rem">📝 Resume</button>
+    </li>
+  </ul>
+
+  <div class="tab-content" id="toolTabContent">
+
+    <!-- ── Roadmap Generator ─────────────────────────────────────────── -->
+    <div class="tab-pane fade show active" id="roadmapTab">
+      <div class="row g-4">
+        <div class="col-lg-4">
+          <div class="card-custom">
+            <h5 style="margin-bottom:1.25rem">🗺️ Generate Roadmap</h5>
+            <div class="form-group">
+              <label class="form-label-custom">Target Career</label>
+              <input type="text" id="roadmapCareer" class="form-control-custom"
+                value="{{ profile.goals if profile and profile.goals else '' }}"
+                placeholder="e.g. Machine Learning Engineer"/>
+            </div>
+            {% if profile and profile.skills %}
+            <div style="font-size:.8rem;color:var(--text-muted);margin-bottom:1rem;padding:.5rem .75rem;background:rgba(15,98,254,.05);border-radius:8px">
+              ✅ Using your saved profile ({{ profile.skills|length }} skills, {{ profile.education or 'education not set' }})
+            </div>
+            {% endif %}
+            <button class="btn-primary-custom w-100" onclick="RoadmapGenerator.generate()">
+              🚀 Generate My Roadmap
+            </button>
+          </div>
+        </div>
+        <div class="col-lg-8">
+          <div class="card-custom" style="min-height:280px">
+            <div id="roadmapResults">
+              <div style="text-align:center;padding:3rem 1rem;color:var(--text-muted)">
+                <div style="font-size:2.5rem;margin-bottom:1rem">🗺️</div>
+                <p>Enter a target career and click <strong>Generate</strong> to create your personalised roadmap with IBM Granite AI.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Skill Gap Analysis ────────────────────────────────────────── -->
+    <div class="tab-pane fade" id="skillGapTab">
+      <div class="row g-4">
+        <div class="col-lg-4">
+          <div class="card-custom">
+            <h5 style="margin-bottom:1.25rem">📊 Skill Gap Analysis</h5>
+            <div class="form-group">
+              <label class="form-label-custom">Target Career</label>
+              <input type="text" id="sgCareer" class="form-control-custom" placeholder="e.g. Data Scientist"/>
+            </div>
+            <div class="form-group">
+              <label class="form-label-custom">Your Current Skills</label>
+              <textarea id="sgSkills" class="form-control-custom" rows="3"
+                placeholder="Python, SQL, Excel, Statistics (comma separated)"
+              >{{ profile.skills|join(', ') if profile and profile.skills else '' }}</textarea>
+              <div style="font-size:.75rem;color:var(--text-muted);margin-top:.25rem">Separate with commas or leave blank to use profile skills.</div>
+            </div>
+            <button class="btn-primary-custom w-100" onclick="RoadmapGenerator.generateSkillGap()">
+              📊 Analyse Skill Gaps
+            </button>
+          </div>
+        </div>
+        <div class="col-lg-8">
+          <div class="card-custom" style="min-height:280px">
+            <div id="skillGapResults">
+              <div style="text-align:center;padding:3rem 1rem;color:var(--text-muted)">
+                <div style="font-size:2.5rem;margin-bottom:1rem">📊</div>
+                <p>Enter your target career and current skills to get a prioritised gap analysis with IBM Granite.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Courses ───────────────────────────────────────────────────── -->
+    <div class="tab-pane fade" id="coursesTab">
+      <div class="row g-4">
+        <div class="col-lg-4">
+          <div class="card-custom">
+            <h5 style="margin-bottom:1.25rem">📚 Course Suggestions</h5>
+            <div class="form-group">
+              <label class="form-label-custom">Target Career / Role</label>
+              <input type="text" id="courseCareer" class="form-control-custom" placeholder="e.g. Cloud Engineer"/>
+            </div>
+            <div class="form-group">
+              <label class="form-label-custom">Current Skills (optional)</label>
+              <textarea id="courseSkills" class="form-control-custom" rows="2" placeholder="Python, Linux, Networking..."></textarea>
+            </div>
+            <div class="form-group">
+              <label class="form-label-custom">Budget Preference</label>
+              <select id="courseBudget" class="form-select-custom">
+                <option value="free">Free only (IBM SkillsBuild, Coursera audit)</option>
+                <option value="low">Low cost (&lt; $50)</option>
+                <option value="any">Any budget</option>
+              </select>
+            </div>
+            <button class="btn-primary-custom w-100" onclick="RoadmapGenerator.suggestCourses()">
+              📚 Find Best Courses
+            </button>
+          </div>
+        </div>
+        <div class="col-lg-8">
+          <div class="card-custom" style="min-height:280px">
+            <div id="courseResults">
+              <div style="text-align:center;padding:3rem 1rem;color:var(--text-muted)">
+                <div style="font-size:2.5rem;margin-bottom:1rem">📚</div>
+                <p>Discover IBM SkillsBuild, Coursera, and edX courses tailored to your career. Free options prioritised.</p>
+                <div style="display:flex;gap:.75rem;justify-content:center;margin-top:1rem;flex-wrap:wrap">
+                  <a href="https://skillsbuild.org" target="_blank" style="font-size:.8rem;color:var(--primary)">🔵 IBM SkillsBuild</a>
+                  <a href="https://coursera.org" target="_blank" style="font-size:.8rem;color:var(--primary)">📗 Coursera</a>
+                  <a href="https://edx.org" target="_blank" style="font-size:.8rem;color:var(--primary)">📘 edX</a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Resume Reviewer ───────────────────────────────────────────── -->
+    <div class="tab-pane fade" id="resumeTab">
+      <div class="row g-4">
+        <div class="col-lg-4">
+          <div class="card-custom">
+            <h5 style="margin-bottom:1.25rem">📝 Resume Reviewer</h5>
+            <div class="form-group">
+              <label class="form-label-custom">Target Job Role</label>
+              <input type="text" id="resumeRole" class="form-control-custom" placeholder="e.g. Software Engineer, Data Analyst"/>
+            </div>
+            <div class="form-group">
+              <label class="form-label-custom">Paste Your Resume Text</label>
+              <textarea id="resumeText" class="form-control-custom" rows="8" placeholder="Paste your resume content here...
+            
+Name: John Doe
+Email: john@example.com
+
+EDUCATION:
+B.Tech Computer Science - XYZ University (2024) - CGPA 8.5
+
+SKILLS:
+Python, JavaScript, SQL, React
+
+EXPERIENCE:
+Intern - ABC Company (Jun 2023 - Dec 2023)
+- Developed REST APIs using Python Flask
+- Worked with MySQL database
+
+PROJECTS:
+Movie Recommendation System using ML..."></textarea>
+            </div>
+            <button class="btn-primary-custom w-100" onclick="RoadmapGenerator.reviewResume()">
+              📝 Analyse My Resume
+            </button>
+          </div>
+        </div>
+        <div class="col-lg-8">
+          <div class="card-custom" style="min-height:280px">
+            <div id="resumeResults">
+              <div style="text-align:center;padding:3rem 1rem;color:var(--text-muted)">
+                <div style="font-size:2.5rem;margin-bottom:1rem">📝</div>
+                <p>Get an ATS score, keyword analysis, and specific rewrite suggestions from IBM Granite AI.</p>
+                <div style="margin-top:1rem;padding:1rem;background:var(--bg-surface);border-radius:10px;text-align:left;font-size:.8rem">
+                  <strong>What you'll get:</strong>
+                  <ul style="margin-top:.5rem;margin-bottom:0;padding-left:1.2rem">
+                    <li>Resume score out of 10</li>
+                    <li>ATS keyword gaps</li>
+                    <li>Section-by-section feedback</li>
+                    <li>Rewritten achievement bullets</li>
+                    <li>Missing sections to add</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- tab-content -->
+</main>
+
+<footer>
+  <div class="container">
+    <p>🤖 <strong>CareerGuide AI</strong> · Powered by IBM watsonx.ai · Granite · IBM Cloud Lite</p>
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/marked@12.0.0/marked.min.js"></script>
+<script src="/static/js/app.js"></script>
+</body>
+</html>
